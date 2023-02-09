@@ -1,4 +1,3 @@
-mod todo;
 use sqlx::SqlitePool;
 
 #[tokio::main]
