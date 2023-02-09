@@ -18,7 +18,8 @@ async fn main() -> Result<(), sqlx::Error> {
 
             println!(
                 "Added \"{:?}\" with id \"{}\"",
-                result[0].content, result[0].id
+                result[0].content.to_owned().unwrap(),
+                result[0].id
             )
         }
         "delete" | "d" => {
@@ -31,8 +32,40 @@ async fn main() -> Result<(), sqlx::Error> {
                 query_result[0].content, query_result[0].id
             )
         }
-        "check" | "c" => println!("Deleted \"{}\" with id \"{}\"", "placeholder", 1),
-        "uncheck" | "u" => println!("Unchecked \"{}\" with id \"{}\"", "placeholder", 1),
+        "check" | "c" => {
+            let query_result = sqlx::query!(
+                "UPDATE Todo
+                SET checked = 1
+                WHERE id = ?
+                RETURNING *",
+                args[2],
+            )
+            .fetch_all(&pool)
+            .await?;
+
+            println!(
+                "Checked \"{}\" with id \"{}\"",
+                query_result[0].content.to_owned().unwrap(),
+                args[2]
+            )
+        }
+        "uncheck" | "u" => {
+            let query_result = sqlx::query!(
+                "UPDATE Todo
+                SET checked = 0
+                WHERE id = ?
+                RETURNING *",
+                args[2],
+            )
+            .fetch_all(&pool)
+            .await?;
+
+            println!(
+                "Unchecked \"{}\" with id \"{}\"",
+                query_result[0].content.to_owned().unwrap(),
+                args[2]
+            )
+        }
         "edit" | "e" => {
             let query_result = sqlx::query!(
                 "UPDATE Todo
@@ -46,8 +79,9 @@ async fn main() -> Result<(), sqlx::Error> {
             .await?;
 
             println!(
-                "Changed from \"{:?}\" to \"{:?}\" with id \"{}\"",
-                args[3], query_result[0].content, args[2]
+                "Changed to \"{:?}\" with id \"{}\"",
+                query_result[0].content.to_owned().unwrap(),
+                args[2]
             );
         }
         "list" | "l" | _ => {
