@@ -6,8 +6,8 @@ struct Todo {
     checked: bool,
 }
 
-#[async_std::main]
-async fn main() {
+#[tokio::main]
+async fn main() -> Result<(), sqlx::Error> {
     let args = std::env::args().collect::<Vec<String>>();
 
     if args[1] == "list" || args[1] == "l" {
@@ -40,25 +40,27 @@ async fn main() {
     }
 
     if args[1] == "add" || args[1] == "a" {
-        return println!("Added \"{}\" with id \"{}\"", &args[2], 1);
+        println!("Added \"{}\" with id \"{}\"", &args[2], 1);
     }
 
     if args[1] == "delete" || args[1] == "d" {
-        return println!("Deleted \"{}\" with id \"{}\"", "placeholder", 1);
+        println!("Deleted \"{}\" with id \"{}\"", "placeholder", 1);
     }
 
     if args[1] == "check" || args[1] == "c" {
-        return println!("Checked \"{}\" with id \"{}\"", "placeholder", 1);
+        println!("Checked \"{}\" with id \"{}\"", "placeholder", 1);
     }
 
     if args[1] == "uncheck" || args[1] == "u" {
-        return println!("Unchecked \"{}\" with id \"{}\"", "placeholder", 1);
+        println!("Unchecked \"{}\" with id \"{}\"", "placeholder", 1);
     }
 
     if args[1] == "edit" || args[1] == "e" {
-        return println!(
+        println!(
             "Changed from \"{}\" to \"{}\" with id \"{}\"",
             "placeholder 1", "placeholder 2", 1
         );
     }
+
+    Ok(())
 }
