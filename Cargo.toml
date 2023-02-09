@@ -1,0 +1,10 @@
+[package]
+edition = "2021"
+name = "try_todo_cli"
+version = "0.1.0"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+sqlx = {features = ["sqlite", "runtime-tokio-native-tls"]}
+async-std = { version = "1", features = [ "attributes" ] }
