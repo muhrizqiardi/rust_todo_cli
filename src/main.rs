@@ -22,18 +22,42 @@ async fn main() -> Result<(), sqlx::Error> {
             )
         }
         "delete" | "d" => {
-            println!("Deleted \"{}\" with id \"{}\"", "placeholder", 1)
+            let query_result = sqlx::query!("DELETE FROM Todo WHERE id = ? RETURNING *", args[2])
+                .fetch_all(&pool)
+                .await?;
+
+            println!(
+                "Deleted \"{}\" with id \"{}\"",
+                query_result[0].content, query_result[0].id
+            )
         }
         "check" | "c" => println!("Deleted \"{}\" with id \"{}\"", "placeholder", 1),
         "uncheck" | "u" => println!("Unchecked \"{}\" with id \"{}\"", "placeholder", 1),
-        "edit" | "e" => println!(
-            "Changed from \"{}\" to \"{}\" with id \"{}\"",
-            "placeholder 1", "placeholder 2", 1
-        ),
-        "list" | "l" | _ => {
-            let result = sqlx::query!("SELECT * FROM Todo").fetch_all(&pool).await?;
+        "edit" | "e" => {
+            let query_result = sqlx::query!(
+                "UPDATE Todo
+                SET content = ?
+                WHERE id = ?
+                RETURNING *",
+                args[3],
+                args[2],
+            )
+            .fetch_all(&pool)
+            .await?;
 
-            for item in result {
+            println!(
+                "Changed from \"{:?}\" to \"{:?}\" with id \"{}\"",
+                args[3], query_result[0].content, args[2]
+            );
+        }
+        "list" | "l" | _ => {
+            let query_result = sqlx::query!("SELECT * FROM Todo").fetch_all(&pool).await?;
+
+            if query_result.len() == 0 {
+                println!("(empty)")
+            };
+
+            for item in query_result {
                 println!(
                     "{}. [{}] {}",
                     item.id,
